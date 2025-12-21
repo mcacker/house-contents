@@ -1,42 +1,34 @@
 
-function openLightbox(src) {
-    const lb = document.getElementById('lightbox');
+let lbImages = [];
+let lbIndex = 0;
+function openLightboxWithState(cardId, index) {
+    const card = document.getElementById(cardId);
+    lbImages = JSON.parse(card.getAttribute('data-images'));
+    lbIndex = index;
+    updateLightboxDisplay();
+    document.getElementById('lightbox').style.display = "block";
+}
+function updateLightboxDisplay() {
     const img = document.getElementById('lightbox-img');
-    img.src = src;
-    lb.style.display = "block";
+    img.src = lbImages[lbIndex].full;
+    const arrows = document.querySelectorAll('.lb-nav-btn');
+    arrows.forEach(a => a.style.display = lbImages.length > 1 ? 'block' : 'none');
 }
-function closeLightbox() {
-    document.getElementById('lightbox').style.display = "none";
+function changeLightboxImage(dir) {
+     lbIndex += dir;
+     if (lbIndex >= lbImages.length) lbIndex = 0;
+     if (lbIndex < 0) lbIndex = lbImages.length - 1;
+     updateLightboxDisplay();
 }
-window.onclick = function(event) {
-    const lb = document.getElementById('lightbox');
-    if (event.target == lb) {
-        lb.style.display = "none";
-    }
-}
-
+function closeLightbox() { document.getElementById('lightbox').style.display = "none"; }
+document.getElementById('lightbox').onclick = function(e) { if (e.target === this) closeLightbox(); };
 function openTab(tabName) {
-    // Hide all tab contents
-    const content = document.getElementsByClassName('tab-content');
-    for (let i = 0; i < content.length; i++) {
-        content[i].classList.remove('active');
-    }
-
-    // Deactivate all buttons
-    const buttons = document.getElementsByClassName('tab-button');
-    for (let i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove('active');
-    }
-
-    // Show the current tab content and activate the button
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
     document.getElementById(tabName + '_content').classList.add('active');
     document.getElementById(tabName + '_button').classList.add('active');
 }
-
-// Open the first tab on load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const firstTab = document.querySelector('.tab-button');
-    if (firstTab) {
-        openTab(firstTab.id.replace('_button', ''));
-    }
+    if (firstTab) openTab(firstTab.id.replace('_button', ''));
 });
